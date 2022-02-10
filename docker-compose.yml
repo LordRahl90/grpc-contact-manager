@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  postgres:
+    container_name: contact-db
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      - POSTRGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - "grpc-db-volume:/var/lib/postgresl/data"
+
+volumes:
+  grpc-db-volume:
+    driver: local

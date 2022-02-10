@@ -1,0 +1,48 @@
+syntax = "proto3";
+package contact;
+
+option go_package = "github.com/lordrahl90/grpc-contact-manager;grpc_contact_manager";
+
+service ContactManager {
+    rpc CreateNewUser(CreateUserRequest) returns (User) {}
+    rpc Authenticate(AuthUserRequest) returns (User) {}
+    rpc NewContact(Contact) returns (Contact){}
+    rpc GetContactByID(FindContactRequest) returns (Contact){}
+    rpc GetUserContacts(User) returns (ContactList){}
+    rpc UpdateContact(Contact) returns (Contact){}    
+}
+
+
+message AuthUserRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message CreateUserRequest {
+    string name = 1;
+    string email = 2;
+    string password = 3;
+}
+
+message User {
+    int32 id = 1;
+    string name = 2;
+    string email = 3;
+    string password = 4;
+    string token = 5;
+}
+
+message Contact {
+    int32 userID = 1;
+    string name = 2;
+    string address = 3;
+    string phone = 4;
+}
+
+message FindContactRequest {
+    int32 contactID = 1;
+}
+
+message ContactList {
+    repeated Contact contacts = 1;
+}
