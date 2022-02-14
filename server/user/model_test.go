@@ -2,6 +2,8 @@ package user
 
 import (
 	"database/sql/driver"
+	"log"
+	"os"
 	"regexp"
 	"strconv"
 	"testing"
@@ -12,6 +14,29 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+var (
+	db   DB
+	mock sqlmock.Sqlmock
+)
+
+func TestMain(m *testing.M) {
+	d, sqlMock, err := sqlmock.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+	conn, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: d,
+	}))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db = DB{Conn: conn}
+	mock = sqlMock
+
+	os.Exit(m.Run())
+}
 
 func TestValidate(t *testing.T) {
 	table := []struct {
@@ -65,14 +90,6 @@ func TestValidate(t *testing.T) {
 }
 
 func TestCreate(t *testing.T) {
-	dbase, mock, err := sqlmock.New()
-	require.Nil(t, err)
-	conn, err := gorm.Open(postgres.New(postgres.Config{
-		Conn: dbase,
-	}))
-	require.NoError(t, err)
-	db := DB{Conn: conn}
-
 	mock.ExpectBegin()
 	mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "users" ("created_at","updated_at","deleted_at","name","email","password","token") VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING "id"`)).
 		WithArgs(AnyTime{}, AnyTime{}, nil, "Alugbin LordRahl", "tolaabbey009@gmail.com", "password", "").
@@ -138,3 +155,13 @@ func TestCreateWithNoEmail(t *testing.T) {
 	require.NotNil(t, err)
 	require.EqualError(t, err, "email must be provided")
 }
+
+func TestAuthenticate(t *testing.T) {
+
+}
+
+func TestGenerateToken(t *testing.T) {
+
+}
+
+func TestValidateToken(t *testing.T) {}

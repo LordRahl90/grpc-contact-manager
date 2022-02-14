@@ -2,7 +2,6 @@ package user
 
 import (
 	"errors"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -32,11 +31,23 @@ func (d *DB) Create(user User) (*User, error) {
 		return nil, err
 	}
 
-	fmt.Printf("Hello! Got here\n")
-
 	result := d.Conn.Create(&user)
 
 	return &user, result.Error
+}
+
+// Authenticate authenticates the user using the email and password stored in the database
+func (d *DB) Authenticate(email, password string) (*User, error) {
+	return nil, nil
+}
+
+// GenerateToken generates the JWT token for the given user
+func (u *User) GenerateToken() (string, error) {
+	return "", nil
+}
+
+func ValidateToken(token string) bool {
+	return false
 }
 
 func (u User) validate() error {
