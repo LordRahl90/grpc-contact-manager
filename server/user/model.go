@@ -2,10 +2,7 @@ package user
 
 import (
 	"errors"
-	"fmt"
-	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -18,7 +15,7 @@ var (
 	errTokenExpired = errors.New("expired token")
 	errInvalidToken = errors.New("invalid token or claims not found")
 
-	signingSecret = "hello world"
+	signingSecret interface{} = []byte("hello world")
 )
 
 // User model
@@ -62,51 +59,12 @@ func (d *DB) Authenticate(email, password string) (*User, error) {
 		return nil, err
 	}
 	user.Password = ""
-	token, err := generateToken(uint32(user.ID))
+	token, err := generateToken(uint32(user.ID), false)
 	if err != nil {
 		return nil, err
 	}
 	user.Token = token
 	return &user, nil
-}
-
-// generateToken generates the JWT token for the given user
-func generateToken(userID uint32) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"nbf":     time.Now().Add(24 * time.Hour),
-	})
-
-	return token.SignedString([]byte(signingSecret))
-}
-
-// validateToken this should validate the token string and return the userID
-func validateToken(tokenString string) (uint32, error) {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(signingSecret), nil
-	})
-	if err != nil {
-		return 0, err
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		return 0, errInvalidToken
-	}
-	exp := claims["nbf"].(string)
-	expiryDate, err := time.Parse(time.RFC3339, exp)
-	if err != nil {
-		return 0, err
-	}
-
-	if expiryDate.Before(time.Now()) {
-		return 0, errTokenExpired
-	}
-
-	return uint32(claims["user_id"].(float64)), nil
 }
 
 func (u User) validate() error {

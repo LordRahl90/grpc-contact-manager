@@ -160,6 +160,7 @@ func TestCreateWithNoEmail(t *testing.T) {
 }
 
 func TestAuthenticate(t *testing.T) {
+	signingSecret = []byte("hello world")
 	fakePassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 	require.Nil(t, err)
 	dbMock.ExpectBegin()
@@ -188,24 +189,4 @@ func TestAuthenticate(t *testing.T) {
 	require.NotNil(t, authUser)
 	assert.NotEmpty(t, authUser.Token)
 	assert.Empty(t, authUser.Password)
-}
-
-func TestGenerateToken(t *testing.T) {
-	userID := 1
-	token, err := generateToken(uint32(userID))
-	require.Nil(t, err)
-	assert.NotEmpty(t, token)
-}
-
-func TestValidateToken(t *testing.T) {
-	userID := 1
-	tokenString, err := generateToken(uint32(userID))
-	require.Nil(t, err)
-	assert.NotEmpty(t, tokenString)
-}
-
-func TestValidateInvalidToken(t *testing.T) {
-	authUserID, err := validateToken("hello one two three")
-	require.NotNil(t, err)
-	require.Equal(t, uint32(0), authUserID)
 }
