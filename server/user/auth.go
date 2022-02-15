@@ -7,13 +7,12 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// generateToken generates the JWT token for the given user
-func generateToken(userID uint32, expired bool) (string, error) {
-	expiry := time.Now().Add(24 * time.Hour)
-	if expired {
-		expiry = time.Now().Add(-24 * time.Hour)
-	}
+var (
+	expiry = time.Now().Add(24 * time.Hour)
+)
 
+// generateToken generates the JWT token for the given user
+func generateToken(userID uint32) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,
 		"nbf":     expiry,

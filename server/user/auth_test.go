@@ -2,6 +2,7 @@ package user
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -9,7 +10,7 @@ import (
 
 func TestGenerateToken(t *testing.T) {
 	userID := 1
-	token, err := generateToken(uint32(userID), false)
+	token, err := generateToken(uint32(userID))
 	require.Nil(t, err)
 	assert.NotEmpty(t, token)
 }
@@ -17,7 +18,7 @@ func TestGenerateToken(t *testing.T) {
 func TestGenerateTokenWithInvalidSigningSecret(t *testing.T) {
 	signingSecret = "hello world"
 	userID := 1
-	tokenString, err := generateToken(uint32(userID), true)
+	tokenString, err := generateToken(uint32(userID))
 	require.NotNil(t, err)
 	assert.EqualError(t, err, "key is of invalid type")
 	assert.Empty(t, tokenString)
@@ -26,7 +27,7 @@ func TestGenerateTokenWithInvalidSigningSecret(t *testing.T) {
 func TestValidateToken(t *testing.T) {
 	signingSecret = []byte("hello world")
 	userID := 1
-	tokenString, err := generateToken(uint32(userID), false)
+	tokenString, err := generateToken(uint32(userID))
 	require.Nil(t, err)
 	assert.NotEmpty(t, tokenString)
 }
@@ -40,7 +41,8 @@ func TestValidateInvalidToken(t *testing.T) {
 func TestValidateExpiredToken(t *testing.T) {
 	signingSecret = []byte("hello world")
 	userID := 1
-	tokenString, err := generateToken(uint32(userID), true)
+	expiry = time.Now().Add(-24 * time.Hour)
+	tokenString, err := generateToken(uint32(userID))
 	require.Nil(t, err)
 	assert.NotEmpty(t, tokenString)
 
@@ -53,7 +55,7 @@ func TestValidateExpiredToken(t *testing.T) {
 func TestValidateTokenWithInvalidSigningSecret(t *testing.T) {
 	signingSecret = []byte("hello world")
 	userID := 1
-	tokenString, err := generateToken(uint32(userID), false)
+	tokenString, err := generateToken(uint32(userID))
 	require.Nil(t, err)
 	assert.NotEmpty(t, tokenString)
 

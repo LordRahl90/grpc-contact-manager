@@ -59,7 +59,7 @@ func (d *DB) Authenticate(email, password string) (*User, error) {
 		return nil, err
 	}
 	user.Password = ""
-	token, err := generateToken(uint32(user.ID), false)
+	token, err := generateToken(uint32(user.ID))
 	if err != nil {
 		return nil, err
 	}
