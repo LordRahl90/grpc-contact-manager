@@ -11,10 +11,10 @@ jobs:
     name: Linting
     runs-on: ubuntu-latest
     steps:
-    - name: Lint and Vet
-      uses: golangci/golangci-lint-action@v2
-      with:
-        version: latest
+      - name: Lint and Vet
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
 
   test:
     runs-on: ubuntu-latest
