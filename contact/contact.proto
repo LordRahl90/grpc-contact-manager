@@ -37,10 +37,11 @@ message Contact {
     string name = 2;
     string address = 3;
     string phone = 4;
+    string email = 5;
 }
 
 message FindContactRequest {
-    int32 contactID = 1;
+    int32 userID = 1;
 }
 
 message ContactList {
