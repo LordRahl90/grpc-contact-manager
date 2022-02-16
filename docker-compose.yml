@@ -11,7 +11,28 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - "grpc-db-volume:/var/lib/postgresl/data"
+    networks:
+      - grpc-contact
+
+  cockroachdb:
+    container_name: roach
+    image: cockroachdb/cockroach:latest
+    ports:
+      - 26257:26257
+      - 8800:8080
+    volumes:
+      - "grpc-roach-volume:/cockroach/cockroach-data"
+    networks:
+      - grpc-contact
+    command: start-single-node --insecure
 
 volumes:
   grpc-db-volume:
     driver: local
+  grpc-roach-volume:
+    driver: local
+
+networks:
+  grpc-contact:
+    driver: bridge
+  
