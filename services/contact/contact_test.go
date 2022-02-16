@@ -21,7 +21,9 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	conn.AutoMigrate(&Contact{})
+	if err := conn.AutoMigrate(&Contact{}); err != nil {
+		panic(err)
+	}
 	db = &DB{Conn: conn}
 
 	os.Exit(m.Run())
