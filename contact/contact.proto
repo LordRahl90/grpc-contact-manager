@@ -4,12 +4,15 @@ package contact;
 option go_package = "github.com/lordrahl90/grpc-contact-manager;grpc_contact_manager";
 
 service ContactManager {
-    rpc CreateNewUser(CreateUserRequest) returns (User) {}
-    rpc Authenticate(AuthUserRequest) returns (User) {}
     rpc NewContact(Contact) returns (Contact){}
     rpc GetContactByID(FindContactRequest) returns (Contact){}
     rpc GetUserContacts(User) returns (ContactList){}
     rpc UpdateContact(Contact) returns (Contact){}    
+}
+
+service UserManager {
+    rpc CreateNewUser(CreateUserRequest) returns (User) {}
+    rpc Authenticate(AuthUserRequest) returns (User) {}
 }
 
 

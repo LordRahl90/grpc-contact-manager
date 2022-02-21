@@ -31,6 +31,11 @@ type DB struct {
 	Conn *gorm.DB
 }
 
+// Migrate migrates a new user repository instance.
+func Migrate(conn *gorm.DB) error {
+	return conn.AutoMigrate(User{})
+}
+
 // Create creates a new user
 func (d *DB) Create(user User) (*User, error) {
 	if err := user.validate(); err != nil {

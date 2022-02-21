@@ -20,11 +20,10 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	dbase, err := New(conn)
-	if err != nil {
+	if err := Migrate(conn); err != nil {
 		panic(err)
 	}
-	db = dbase
+	db = &DB{Conn: conn}
 
 	os.Exit(m.Run())
 }

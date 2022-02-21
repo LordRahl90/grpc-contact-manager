@@ -18,8 +18,6 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ContactManagerClient interface {
-	CreateNewUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error)
-	Authenticate(ctx context.Context, in *AuthUserRequest, opts ...grpc.CallOption) (*User, error)
 	NewContact(ctx context.Context, in *Contact, opts ...grpc.CallOption) (*Contact, error)
 	GetContactByID(ctx context.Context, in *FindContactRequest, opts ...grpc.CallOption) (*Contact, error)
 	GetUserContacts(ctx context.Context, in *User, opts ...grpc.CallOption) (*ContactList, error)
@@ -32,24 +30,6 @@ type contactManagerClient struct {
 
 func NewContactManagerClient(cc grpc.ClientConnInterface) ContactManagerClient {
 	return &contactManagerClient{cc}
-}
-
-func (c *contactManagerClient) CreateNewUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error) {
-	out := new(User)
-	err := c.cc.Invoke(ctx, "/contact.ContactManager/CreateNewUser", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *contactManagerClient) Authenticate(ctx context.Context, in *AuthUserRequest, opts ...grpc.CallOption) (*User, error) {
-	out := new(User)
-	err := c.cc.Invoke(ctx, "/contact.ContactManager/Authenticate", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *contactManagerClient) NewContact(ctx context.Context, in *Contact, opts ...grpc.CallOption) (*Contact, error) {
@@ -92,8 +72,6 @@ func (c *contactManagerClient) UpdateContact(ctx context.Context, in *Contact, o
 // All implementations must embed UnimplementedContactManagerServer
 // for forward compatibility
 type ContactManagerServer interface {
-	CreateNewUser(context.Context, *CreateUserRequest) (*User, error)
-	Authenticate(context.Context, *AuthUserRequest) (*User, error)
 	NewContact(context.Context, *Contact) (*Contact, error)
 	GetContactByID(context.Context, *FindContactRequest) (*Contact, error)
 	GetUserContacts(context.Context, *User) (*ContactList, error)
@@ -105,12 +83,6 @@ type ContactManagerServer interface {
 type UnimplementedContactManagerServer struct {
 }
 
-func (UnimplementedContactManagerServer) CreateNewUser(context.Context, *CreateUserRequest) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateNewUser not implemented")
-}
-func (UnimplementedContactManagerServer) Authenticate(context.Context, *AuthUserRequest) (*User, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
-}
 func (UnimplementedContactManagerServer) NewContact(context.Context, *Contact) (*Contact, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewContact not implemented")
 }
@@ -134,42 +106,6 @@ type UnsafeContactManagerServer interface {
 
 func RegisterContactManagerServer(s grpc.ServiceRegistrar, srv ContactManagerServer) {
 	s.RegisterService(&ContactManager_ServiceDesc, srv)
-}
-
-func _ContactManager_CreateNewUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateUserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ContactManagerServer).CreateNewUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/contact.ContactManager/CreateNewUser",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContactManagerServer).CreateNewUser(ctx, req.(*CreateUserRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ContactManager_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AuthUserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ContactManagerServer).Authenticate(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/contact.ContactManager/Authenticate",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ContactManagerServer).Authenticate(ctx, req.(*AuthUserRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _ContactManager_NewContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -252,14 +188,6 @@ var ContactManager_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ContactManagerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateNewUser",
-			Handler:    _ContactManager_CreateNewUser_Handler,
-		},
-		{
-			MethodName: "Authenticate",
-			Handler:    _ContactManager_Authenticate_Handler,
-		},
-		{
 			MethodName: "NewContact",
 			Handler:    _ContactManager_NewContact_Handler,
 		},
@@ -274,6 +202,128 @@ var ContactManager_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateContact",
 			Handler:    _ContactManager_UpdateContact_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "contact/contact.proto",
+}
+
+// UserManagerClient is the client API for UserManager service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type UserManagerClient interface {
+	CreateNewUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error)
+	Authenticate(ctx context.Context, in *AuthUserRequest, opts ...grpc.CallOption) (*User, error)
+}
+
+type userManagerClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewUserManagerClient(cc grpc.ClientConnInterface) UserManagerClient {
+	return &userManagerClient{cc}
+}
+
+func (c *userManagerClient) CreateNewUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/contact.UserManager/CreateNewUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userManagerClient) Authenticate(ctx context.Context, in *AuthUserRequest, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, "/contact.UserManager/Authenticate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// UserManagerServer is the server API for UserManager service.
+// All implementations must embed UnimplementedUserManagerServer
+// for forward compatibility
+type UserManagerServer interface {
+	CreateNewUser(context.Context, *CreateUserRequest) (*User, error)
+	Authenticate(context.Context, *AuthUserRequest) (*User, error)
+	mustEmbedUnimplementedUserManagerServer()
+}
+
+// UnimplementedUserManagerServer must be embedded to have forward compatible implementations.
+type UnimplementedUserManagerServer struct {
+}
+
+func (UnimplementedUserManagerServer) CreateNewUser(context.Context, *CreateUserRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateNewUser not implemented")
+}
+func (UnimplementedUserManagerServer) Authenticate(context.Context, *AuthUserRequest) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
+}
+func (UnimplementedUserManagerServer) mustEmbedUnimplementedUserManagerServer() {}
+
+// UnsafeUserManagerServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UserManagerServer will
+// result in compilation errors.
+type UnsafeUserManagerServer interface {
+	mustEmbedUnimplementedUserManagerServer()
+}
+
+func RegisterUserManagerServer(s grpc.ServiceRegistrar, srv UserManagerServer) {
+	s.RegisterService(&UserManager_ServiceDesc, srv)
+}
+
+func _UserManager_CreateNewUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserManagerServer).CreateNewUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/contact.UserManager/CreateNewUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserManagerServer).CreateNewUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserManager_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AuthUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserManagerServer).Authenticate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/contact.UserManager/Authenticate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserManagerServer).Authenticate(ctx, req.(*AuthUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// UserManager_ServiceDesc is the grpc.ServiceDesc for UserManager service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var UserManager_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "contact.UserManager",
+	HandlerType: (*UserManagerServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateNewUser",
+			Handler:    _UserManager_CreateNewUser_Handler,
+		},
+		{
+			MethodName: "Authenticate",
+			Handler:    _UserManager_Authenticate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

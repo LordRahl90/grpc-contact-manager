@@ -9,6 +9,9 @@ services:
       - POSTRGRES_USER=postgres
       - POSTGRES_PASSWORD=password
       - PGDATA=/var/lib/postgresql/data/pgdata
+      - APP_DB_USER=postgres
+      - APP_DB_PASSWORD=password
+      - APP_DB_NAME=postgres
     volumes:
       - "grpc-db-volume:/var/lib/postgresl/data"
     networks:
