@@ -34,7 +34,6 @@ func main() {
 	grpcPort := os.Getenv("USER_PORT")
 	port := os.Getenv("PORT")
 
-	fmt.Printf("\nHost: %s\t Username: %s\t Password: %s\t DB: %s\n", host, userName, password, dbName)
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=5432 sslmode=disable", host, userName, password, dbName)
 	log.Infof("DSN: %s", dsn)
 
