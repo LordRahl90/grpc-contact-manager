@@ -36,6 +36,17 @@ type DB struct {
 	Conn *gorm.DB
 }
 
+// New Creates new contact db instance.
+// This will be useful for cases where different connections can/will be used.
+func New(conn *gorm.DB) (*DB, error) {
+	if err := conn.AutoMigrate(Contact{}); err != nil {
+		return nil, err
+	}
+	return &DB{
+		Conn: conn,
+	}, nil
+}
+
 // Create adds a new contact record for the given user.
 func (db *DB) Create(contact Contact) (*Contact, error) {
 	if err := contact.validate(); err != nil {
