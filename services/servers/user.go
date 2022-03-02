@@ -2,9 +2,10 @@ package servers
 
 import (
 	"context"
+	"net/http"
+
 	pb "grpc-contact-manager/contact"
 	"grpc-contact-manager/services/user"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -119,5 +120,14 @@ func (c *UserManagerGrpc) CreateNewUser(ctx context.Context, in *pb.CreateUserRe
 }
 
 func (c *UserManagerGrpc) Authenticate(ctx context.Context, in *pb.AuthUserRequest) (*pb.User, error) {
-	return nil, nil
+	user, err := c.DB.Authenticate(in.Email, in.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.User{
+		Id:    int32(user.ID),
+		Name:  user.Name,
+		Email: user.Email,
+		Token: user.Token,
+	}, nil
 }

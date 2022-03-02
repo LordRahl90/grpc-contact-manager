@@ -1,10 +1,11 @@
 package servers
 
 import (
-	"grpc-contact-manager/services/user"
 	"log"
 	"os"
 	"testing"
+
+	"grpc-contact-manager/services/user"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

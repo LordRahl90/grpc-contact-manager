@@ -228,6 +228,35 @@ func TestGRPCCreateUser(t *testing.T) {
 	})
 }
 
+func TestGRPCAuthenticateUser(t *testing.T) {
+	ctx := context.Background()
+	in := pb.CreateUserRequest{
+		Name:     "Alugbin Abiodun",
+		Email:    "tolaabbey009@gmail.com",
+		Password: "password",
+	}
+	res, err := usergrpc.CreateNewUser(ctx, &in)
+	require.NoError(t, err)
+	require.NotNil(t, res)
+	assert.Equal(t, int32(1), res.Id)
+	assert.Equal(t, in.Email, res.Email)
+
+	authIn := pb.AuthUserRequest{
+		Email:    in.Email,
+		Password: in.Password,
+	}
+
+	authUser, err := usergrpc.Authenticate(ctx, &authIn)
+	require.NoError(t, err)
+	require.NotNil(t, authUser)
+	assert.Equal(t, res.Id, authUser.Id)
+	assert.NotEmpty(t, authUser.Token)
+
+	t.Cleanup(func() {
+		require.Nil(t, cleanup(usergrpc.DB.Conn))
+	})
+}
+
 func cleanup(db *gorm.DB) error {
 	return db.Exec("DELETE FROM users").Error
 }
