@@ -58,12 +58,12 @@ func (s *Server) StartHttp(ctx context.Context, port string) (*http.Server, erro
 	}
 	// initialize all db repositories
 	// s.userRoutes()
-	s.setupModels()
+	err := s.setupModels()
 
 	return &http.Server{
 		Addr:    port,
 		Handler: s.Router,
-	}, nil
+	}, err
 }
 
 // setupModels sets up server models
