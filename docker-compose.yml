@@ -1,5 +1,20 @@
 version: '3.8'
 services:
+  app:
+    image: lordrahl/grpc-contact
+    container_name: contact-app
+    ports:
+      - 3500:3500
+      - 3501:3501
+      - 5200:5200
+    env_file:
+      - ./.envs/.app.env
+
+    depends_on:
+      - postgres
+    
+    networks:
+      - grpc-contact
   postgres:
     container_name: contact-db
     image: postgres:latest
@@ -29,10 +44,35 @@ services:
       - grpc-contact
     command: start-single-node --insecure
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: grpc-contact-prom
+    ports:
+      - 9000:9090
+    volumes:
+      - .docker/prometheus:/etc/prometheus
+      - prom-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+    depends_on:
+      - app
+    networks:
+      - grpc-contact
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grpc-grafana
+    ports:
+      - 3000:3000
+    networks:
+      - grpc-contact
+
 volumes:
   grpc-db-volume:
     driver: local
   grpc-roach-volume:
+    driver: local
+  
+  prom-data:
     driver: local
 
 networks:

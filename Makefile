@@ -7,4 +7,11 @@ test:
 test-service:
 	go test ./services/$s -v --cover
 
+build:
+	go build -o ./cmd/grpc-contact ./cmd
+
+docker-build:
+	docker build -f .docker/Dockerfile -t lordrahl/grpc-contact:latest .
+
 ts: test-service
+db: docker-build

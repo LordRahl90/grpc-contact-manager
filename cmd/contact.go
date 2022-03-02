@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"grpc-contact-manager/services/middlewares"
 	"grpc-contact-manager/services/servers"
 
-	"github.com/joho/godotenv"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -22,10 +24,10 @@ func main() {
 	log.SetLevel(log.TraceLevel)
 	ctx := context.Background()
 
-	err := godotenv.Load("./.envs/.app.env")
-	if err != nil {
-		panic(err)
-	}
+	// err := godotenv.Load("./.envs/.app.env")
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	host := os.Getenv("HOST")
 	userName := os.Getenv("USERNAME")
@@ -47,11 +49,15 @@ func main() {
 	}
 	log.Info("DB Connected successfully")
 
+	// Register the prometheus metrics
+	middlewares.RegisterPrometheusMetrics()
+
 	server, err := servers.New(db)
 	if err != nil {
 		panic(err)
 	}
 
+	server.Router.Use(middlewares.RecordRequestLatency())
 	server.UserRoutes() //setup the user routes
 	httpServer, err := server.StartHttp(ctx, port)
 	if err != nil {
@@ -61,6 +67,13 @@ func main() {
 	go func() {
 		log.Infof("Start HTTP Server on port: %s", port)
 		if err := httpServer.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		if err := http.ListenAndServe(":3501", nil); err != nil {
 			log.Fatal(err)
 		}
 	}()
