@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	errNoName     = errors.New("name must be provided")
-	errNoEmail    = errors.New("email must be provided")
-	errNoPassword = errors.New("password must be provided")
+	errNoName             = errors.New("name must be provided")
+	errNoEmail            = errors.New("email must be provided")
+	errNoPassword         = errors.New("password must be provided")
+	errConnNotInitialized = errors.New("connection not initialized")
 
 	errTokenExpired = errors.New("expired token")
 	errInvalidToken = errors.New("invalid token or claims not found")
@@ -31,9 +32,17 @@ type DB struct {
 	Conn *gorm.DB
 }
 
+// New creates a new instance of the user repository
+func New(conn *gorm.DB) (*DB, error) {
+	if conn == nil {
+		return nil, errConnNotInitialized
+	}
+	return &DB{Conn: conn}, nil
+}
+
 // Migrate migrates a new user repository instance.
-func Migrate(conn *gorm.DB) error {
-	return conn.AutoMigrate(User{})
+func (d *DB) Migrate() error {
+	return d.Conn.AutoMigrate(User{})
 }
 
 // Create creates a new user

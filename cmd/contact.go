@@ -52,6 +52,7 @@ func main() {
 		panic(err)
 	}
 
+	server.UserRoutes() //setup the user routes
 	httpServer, err := server.StartHttp(ctx, port)
 	if err != nil {
 		panic(err)

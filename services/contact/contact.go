@@ -9,13 +9,14 @@ import (
 )
 
 var (
-	errInvalidUserID  = errors.New("invalid user id")
-	errEmptyName      = errors.New("full name must be provided")
-	errEmptyPhone     = errors.New("phone number must be provided")
-	errEmptyEmail     = errors.New("email must be provided")
-	errEmptyAddress   = errors.New("address must be provided")
-	errContactExists  = errors.New("contact with this email exists")
-	errNotUserContact = errors.New("user has no access to contact")
+	errInvalidUserID      = errors.New("invalid user id")
+	errEmptyName          = errors.New("full name must be provided")
+	errEmptyPhone         = errors.New("phone number must be provided")
+	errEmptyEmail         = errors.New("email must be provided")
+	errEmptyAddress       = errors.New("address must be provided")
+	errContactExists      = errors.New("contact with this email exists")
+	errNotUserContact     = errors.New("user has no access to contact")
+	errConnNotInitialized = errors.New("connection not initialized")
 )
 
 type Contact struct {
@@ -36,9 +37,17 @@ type DB struct {
 	Conn *gorm.DB
 }
 
+// New creates a new instance of the contact repository
+func New(conn *gorm.DB) (*DB, error) {
+	if conn == nil {
+		return nil, errConnNotInitialized
+	}
+	return &DB{Conn: conn}, nil
+}
+
 // Migrate Creates new contact table
-func Migrate(conn *gorm.DB) error {
-	return conn.AutoMigrate(Contact{})
+func (d *DB) Migrate() error {
+	return d.Conn.AutoMigrate(Contact{})
 }
 
 // Create adds a new contact record for the given user.

@@ -35,12 +35,11 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	db = &DB{Conn: conn}
-	// dbase, err := New(conn)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// db = dbase
+	dbase, err := New(conn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	db = dbase
 	dbMock = sqlMock
 
 	os.Exit(m.Run())
