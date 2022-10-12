@@ -12,6 +12,7 @@ import (
 	"grpc-contact-manager/services/middlewares"
 	"grpc-contact-manager/services/servers"
 
+	"github.com/joho/godotenv"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
@@ -24,11 +25,12 @@ func main() {
 	log.SetLevel(log.TraceLevel)
 	ctx := context.Background()
 
-	// err := godotenv.Load("./.envs/.app.env")
-	// if err != nil {
-	// 	panic(err)
-	// }
-
+	if os.Getenv("ENVIRONMENT") == "" || os.Getenv("ENVIRONMENT") == "development" {
+		err := godotenv.Load("./.envs/.env")
+		if err != nil {
+			panic(err)
+		}
+	}
 	host := os.Getenv("HOST")
 	userName := os.Getenv("USERNAME")
 	password := os.Getenv("PASSWORD")

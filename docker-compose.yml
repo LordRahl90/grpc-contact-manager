@@ -7,8 +7,10 @@ services:
       - 3500:3500
       - 3501:3501
       - 5200:5200
+    environment:
+      ENVIRONMENT: testing
     env_file:
-      - ./.envs/.app.env
+      - ./.envs/.env
 
     depends_on:
       - postgres
